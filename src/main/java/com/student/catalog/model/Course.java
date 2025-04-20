@@ -1,6 +1,5 @@
 package com.student.catalog.model;
 
-import java.util.List;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,19 +13,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "catalog")
-public class Catalog {
-    @Id
+@Table(name = "course")
+public class Course {
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String courseCode;       
-    private String courseName;       
-    private String description;      
-    private String department;       
-    private String academicProgram;  
-    private String subjects;   
-    private int credits;             
-    private String facultyId;
-    private double courseFee;
-    
+    private String subCourseCode;   // Unique Subject ID (e.g., MATH101)
+    private String subCourseName;  
+    private String subCourseDesc;
+    private double subCourseFee;    // Associated Department (e.g., Mathematics)
+    private int credits;          // Subject Credits
 }

@@ -1,44 +1,66 @@
 package com.student.catalog.controller;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.student.catalog.model.Catalog;
-import com.student.catalog.repository.CatalogRepository;
+import com.student.catalog.service.CatalogService;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
 @RequestMapping("/catalog")
 public class CatalogController {
-	
-    @Autowired
-    private CatalogRepository catalogRepository;
+
+    private final CatalogService catalogService;
+
+    public CatalogController(CatalogService catalogService) {
+        this.catalogService = catalogService;
+    }
 
     @PostMapping
-    public ResponseEntity<?> createCatalog(@RequestBody Catalog catalog) {
-        Catalog savedPayment = catalogRepository.save(catalog);
-        return ResponseEntity.ok(savedPayment);
+//    @CircuitBreaker(name = "catalog-service", fallbackMethod = "fallbackAddCourse")
+    public ResponseEntity<Catalog> addCourse(@RequestBody Catalog catalog) {
+        return ResponseEntity.ok(catalogService.addCourse(catalog));
     }
-    
-    @GetMapping("/{id}")
-    public ResponseEntity<Catalog> getCatalogById(@PathVariable double id) {
-        Optional<Catalog> student = catalogRepository.findByStudentClass(id);
-        return student.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+
+    public ResponseEntity<Catalog> fallbackAddStudent(Catalog catalog, Throwable ex) {
+        return ResponseEntity.status(503).body(null);
     }
     
     @GetMapping
-    public ResponseEntity<List<Catalog>> getCatalogs() {
-        List<Catalog> catalogs = catalogRepository.findAll();
-        return catalogs.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(catalogs);
+    public ResponseEntity<List<Catalog>> getAllCourses() {
+        return ResponseEntity.ok(catalogService.getAllCourses());
     }
+
+//    @GetMapping("/{courseCode}")
+//    public ResponseEntity<Catalog> getCourse(@PathVariable String courseCode) {
+//        return ResponseEntity.ok(catalogService.getCourseByCode(courseCode));
+//    }
     
+    @GetMapping("/{id}")
+    public ResponseEntity<Catalog> getCourse(@PathVariable long id) {
+        return ResponseEntity.ok(catalogService.getById(id));
+    }
+
+
+    @PutMapping("/{courseCode}")
+    public ResponseEntity<Catalog> updateCourse(@PathVariable String courseCode, @RequestBody Catalog updatedCatalog) {
+        return ResponseEntity.ok(catalogService.updateCourse(courseCode, updatedCatalog));
+    }
+
+    @DeleteMapping("/{courseCode}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable String courseCode) {
+        catalogService.deleteCourse(courseCode);
+        return ResponseEntity.noContent().build();
+    }
 }
