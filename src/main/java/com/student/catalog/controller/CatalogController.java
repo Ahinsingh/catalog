@@ -28,12 +28,12 @@ public class CatalogController {
     }
 
     @PostMapping
-//    @CircuitBreaker(name = "catalog-service", fallbackMethod = "fallbackAddCourse")
+    @CircuitBreaker(name = "catalog-service", fallbackMethod = "fallbackAddCourse")
     public ResponseEntity<Catalog> addCourse(@RequestBody Catalog catalog) {
         return ResponseEntity.ok(catalogService.addCourse(catalog));
     }
 
-    public ResponseEntity<Catalog> fallbackAddStudent(Catalog catalog, Throwable ex) {
+    public ResponseEntity<Catalog> fallbackAddCourse(Catalog catalog, Throwable ex) {
         return ResponseEntity.status(503).body(null);
     }
     
@@ -42,10 +42,10 @@ public class CatalogController {
         return ResponseEntity.ok(catalogService.getAllCourses());
     }
 
-//    @GetMapping("/{courseCode}")
-//    public ResponseEntity<Catalog> getCourse(@PathVariable String courseCode) {
-//        return ResponseEntity.ok(catalogService.getCourseByCode(courseCode));
-//    }
+    @GetMapping("course/{courseCode}")
+    public ResponseEntity<Catalog> getCourseByCCode(@PathVariable String courseCode) {
+        return ResponseEntity.ok(catalogService.getCourseByCode(courseCode));
+    }
     
     @GetMapping("/{id}")
     public ResponseEntity<Catalog> getCourse(@PathVariable long id) {
